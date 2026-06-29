@@ -1,34 +1,30 @@
-# 📰 Dainik Bhaskar News Scraper
+# 📰 NewsLens — Smart News Article Extractor
 
-A client-side news article scraper that extracts content from Dainik Bhaskar 
-and other news websites. Runs entirely in the browser — no backend needed!
-
-## 🚀 Live Demo
-
-👉 **[Open Scraper](https://YOUR_USERNAME.github.io/dainik-bhaskar-scraper/)**
+A beautiful, client-side news article scraper that runs entirely in your browser.
+Paste any Dainik Bhaskar or news URL and get the full article in a clean,
+readable format.
 
 ## ✨ Features
 
-- 🔗 Paste any Dainik Bhaskar article URL
-- 📝 Extracts title, subtitle, author, date, location
-- 📖 Full article content with formatting
-- 🖼️ Hero image + image gallery
-- ⭐ Auto-generated key highlights
-- 🏷️ Categories and tags extraction
-- ⏱️ Read time estimation
-- 📋 Copy, download, and share articles
-- 📱 Fully responsive design
-- 🌙 Beautiful dark theme
-- 📦 Bulk mode for multiple URLs
-- 🔍 Raw JSON data view
+| Feature | Description |
+|---------|-------------|
+| 🌓 Dark / Light Mode | Toggle between themes for comfortable reading |
+| 🌐 Hindi ↔ English Translation | Translate articles between Hindi and English |
+| 📖 Reader-Friendly Typography | Merriweather serif font, adjustable font size |
+| 📜 Extraction History | All extracted articles saved locally with thumbnails |
+| 🖼️ Image Gallery | Hero image + all article images with lightbox |
+| ⭐ Key Highlights | Auto-generated or extracted key points |
+| 📋 Copy / Download / Share | One-click actions for the extracted content |
+| 📱 Fully Responsive | Works on desktop, tablet, and mobile |
+| 🔤 Devanagari Support | Noto Sans Devanagari for Hindi content |
+| 🏷️ Favicon | Custom SVG favicon for professional look |
+| 🆓 100% Free | GitHub Pages, no backend, no API keys |
 
-## 🛠️ Setup on GitHub Pages
+## 🚀 Deploy
 
-1. **Fork or create** a new repository
-2. **Upload** all files maintaining the folder structure
-3. Go to **Settings → Pages**
-4. Under **Source**, select `main` branch and `/ (root)`
-5. Click **Save**
-6. Your site will be live at `https://YOUR_USERNAME.github.io/REPO_NAME/`
+1. Fork this repo or create a new one
+2. Upload all files (keep folder structure)
+3. Go to **Settings → Pages → Source: main branch**
+4. Site goes live at `https://USERNAME.github.io/REPO/`
 
-## 📁 File Structure
+## 📁 Structure
