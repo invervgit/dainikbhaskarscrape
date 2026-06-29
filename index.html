@@ -1,237 +1,386 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dainik Bhaskar News Scraper</title>
+    <title>NewsLens — Smart News Scraper</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="apple-touch-icon" href="favicon.svg">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Devanagari:wght@300;400;500;600;700&family=Merriweather:ital,wght@0,300;0,400;0,700;1,400&family=Source+Code+Pro:wght@400;500&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Styles -->
     <link rel="stylesheet" href="css/style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="NewsLens — Smart News Scraper">
+    <meta property="og:description" content="Extract and read news articles beautifully from any Dainik Bhaskar link">
+    <meta property="og:type" content="website">
+    <meta name="description" content="Free online news article extractor for Dainik Bhaskar. Paste a link, get the full article in a clean, readable format.">
 </head>
 <body>
-    <!-- Header -->
-    <header class="header">
-        <div class="container">
-            <div class="logo">
-                <i class="fas fa-newspaper"></i>
-                <h1>News Scraper</h1>
-                <span class="badge">Dainik Bhaskar</span>
+    <!-- ====== HEADER ====== -->
+    <header class="header" id="header">
+        <div class="container header-inner">
+            <a href="/" class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-rss"></i>
+                </div>
+                <div class="logo-text">
+                    <span class="logo-name">NewsLens</span>
+                    <span class="logo-sub">Smart Article Extractor</span>
+                </div>
+            </a>
+            
+            <div class="header-actions">
+                <!-- Language Toggle -->
+                <div class="lang-switcher" id="langSwitcher">
+                    <button class="lang-btn active" data-lang="en" title="English">EN</button>
+                    <button class="lang-btn" data-lang="hi" title="हिंदी">हि</button>
+                </div>
+                
+                <!-- Theme Toggle -->
+                <button class="theme-toggle" id="themeToggle" title="Toggle Dark/Light Mode">
+                    <i class="fas fa-moon" id="themeIcon"></i>
+                </button>
+                
+                <!-- History Toggle -->
+                <button class="history-toggle" id="historyToggle" title="View History">
+                    <i class="fas fa-history"></i>
+                    <span class="history-count" id="historyCount">0</span>
+                </button>
             </div>
-            <p class="tagline">Paste any Dainik Bhaskar link and extract the full article instantly</p>
         </div>
     </header>
 
-    <!-- Search Section -->
-    <section class="search-section">
-        <div class="container">
-            <div class="search-box">
-                <div class="input-wrapper">
-                    <i class="fas fa-link input-icon"></i>
-                    <input 
-                        type="url" 
-                        id="urlInput" 
-                        placeholder="Paste Dainik Bhaskar article URL here..."
-                        autocomplete="off"
-                    >
-                    <button id="clearBtn" class="clear-btn hidden" title="Clear">
+    <!-- ====== MAIN ====== -->
+    <main class="main">
+        <!-- Search Hero -->
+        <section class="search-hero" id="searchHero">
+            <div class="container">
+                <div class="hero-content">
+                    <h1 class="hero-title" data-i18n="heroTitle">
+                        Extract News Articles<br>
+                        <span class="gradient-text">Beautifully & Instantly</span>
+                    </h1>
+                    <p class="hero-desc" data-i18n="heroDesc">
+                        Paste any Dainik Bhaskar or news article link below. We'll extract the full content, images, and metadata in a clean, readable format.
+                    </p>
+                </div>
+                
+                <div class="search-card">
+                    <div class="search-input-row">
+                        <div class="input-group">
+                            <i class="fas fa-link input-prefix"></i>
+                            <input 
+                                type="url" 
+                                id="urlInput" 
+                                class="search-input"
+                                placeholder="Paste article URL here..."
+                                data-i18n-placeholder="inputPlaceholder"
+                                autocomplete="off"
+                                spellcheck="false"
+                            >
+                            <button class="input-clear hidden" id="clearBtn">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <button class="btn btn-primary btn-extract" id="scrapeBtn">
+                            <i class="fas fa-bolt"></i>
+                            <span data-i18n="extractBtn">Extract</span>
+                        </button>
+                    </div>
+                    
+                    <!-- Bulk Toggle -->
+                    <div class="bulk-area">
+                        <button class="btn-text" id="bulkToggleBtn">
+                            <i class="fas fa-layer-group"></i>
+                            <span data-i18n="bulkMode">Bulk Mode — Multiple Links</span>
+                        </button>
+                        <div class="bulk-box hidden" id="bulkBox">
+                            <textarea 
+                                id="bulkUrls" 
+                                class="bulk-textarea"
+                                placeholder="Paste multiple URLs, one per line..."
+                                data-i18n-placeholder="bulkPlaceholder"
+                                rows="4"
+                            ></textarea>
+                            <button class="btn btn-primary btn-block" id="bulkScrapeBtn">
+                                <i class="fas fa-bolt"></i>
+                                <span data-i18n="extractAll">Extract All Articles</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Quick Info -->
+                <div class="quick-features">
+                    <div class="qf-item">
+                        <i class="fas fa-lock-open"></i>
+                        <span data-i18n="qf1">100% Free</span>
+                    </div>
+                    <div class="qf-item">
+                        <i class="fas fa-server"></i>
+                        <span data-i18n="qf2">No Backend</span>
+                    </div>
+                    <div class="qf-item">
+                        <i class="fas fa-language"></i>
+                        <span data-i18n="qf3">Hindi & English</span>
+                    </div>
+                    <div class="qf-item">
+                        <i class="fas fa-moon"></i>
+                        <span data-i18n="qf4">Dark Mode</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Loading -->
+        <section class="loading-section hidden" id="loadingSection">
+            <div class="container">
+                <div class="loading-card">
+                    <div class="loader">
+                        <div class="loader-ring"></div>
+                        <i class="fas fa-newspaper loader-icon"></i>
+                    </div>
+                    <h3 class="loading-title" data-i18n="loadingTitle">Extracting Article...</h3>
+                    <p class="loading-sub" data-i18n="loadingSub">This usually takes a few seconds</p>
+                    <div class="progress-steps">
+                        <div class="pstep active" id="pstep1">
+                            <div class="pstep-dot"></div>
+                            <span data-i18n="step1">Fetching page</span>
+                        </div>
+                        <div class="pstep-line" id="pline1"></div>
+                        <div class="pstep" id="pstep2">
+                            <div class="pstep-dot"></div>
+                            <span data-i18n="step2">Parsing content</span>
+                        </div>
+                        <div class="pstep-line" id="pline2"></div>
+                        <div class="pstep" id="pstep3">
+                            <div class="pstep-dot"></div>
+                            <span data-i18n="step3">Formatting</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Error -->
+        <section class="error-section hidden" id="errorSection">
+            <div class="container">
+                <div class="error-card">
+                    <div class="error-icon">
+                        <i class="fas fa-exclamation-circle"></i>
+                    </div>
+                    <h3 data-i18n="errorTitle">Extraction Failed</h3>
+                    <p id="errorMessage" data-i18n="errorDesc">Could not extract the article. Please check the URL and try again.</p>
+                    <div class="error-actions">
+                        <button class="btn btn-primary" id="retryBtn">
+                            <i class="fas fa-redo"></i>
+                            <span data-i18n="retry">Try Again</span>
+                        </button>
+                        <button class="btn btn-ghost" id="errorBackBtn">
+                            <i class="fas fa-arrow-left"></i>
+                            <span data-i18n="goBack">Go Back</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ====== RESULTS ====== -->
+        <section class="results-section hidden" id="resultsSection">
+            <div class="container">
+                <!-- Back to Search -->
+                <button class="btn-back" id="backBtn">
+                    <i class="fas fa-arrow-left"></i>
+                    <span data-i18n="newExtraction">New Extraction</span>
+                </button>
+
+                <!-- Article Reader -->
+                <article class="reader" id="reader">
+                    <!-- Top Bar -->
+                    <div class="reader-topbar">
+                        <div class="reader-source">
+                            <img src="https://www.google.com/s2/favicons?domain=bhaskar.com&sz=32" alt="" class="source-favicon" id="sourceFavicon">
+                            <div>
+                                <span class="source-name" id="sourceName">Dainik Bhaskar</span>
+                                <span class="source-date" id="sourceDate"></span>
+                            </div>
+                        </div>
+                        <div class="reader-actions">
+                            <button class="ract-btn" id="translateBtn" title="Translate">
+                                <i class="fas fa-language"></i>
+                            </button>
+                            <button class="ract-btn" id="fontUpBtn" title="Increase Font">
+                                <i class="fas fa-plus"></i> A
+                            </button>
+                            <button class="ract-btn" id="fontDownBtn" title="Decrease Font">
+                                <i class="fas fa-minus"></i> A
+                            </button>
+                            <button class="ract-btn" id="copyBtn" title="Copy">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                            <button class="ract-btn" id="downloadBtn" title="Download">
+                                <i class="fas fa-download"></i>
+                            </button>
+                            <button class="ract-btn" id="shareBtn" title="Share">
+                                <i class="fas fa-share-alt"></i>
+                            </button>
+                            <a class="ract-btn" id="originalLink" href="#" target="_blank" rel="noopener" title="Open Original">
+                                <i class="fas fa-external-link-alt"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Hero Image -->
+                    <div class="reader-hero hidden" id="readerHero">
+                        <img id="heroImage" src="" alt="" class="reader-hero-img">
+                        <div class="reader-hero-overlay">
+                            <span class="hero-caption" id="heroCaption"></span>
+                        </div>
+                    </div>
+
+                    <!-- Reader Body -->
+                    <div class="reader-body">
+                        <!-- Breadcrumbs / Categories -->
+                        <div class="reader-cats" id="readerCats"></div>
+                        
+                        <!-- Title -->
+                        <h1 class="reader-title" id="readerTitle"></h1>
+                        
+                        <!-- Subtitle -->
+                        <p class="reader-subtitle hidden" id="readerSubtitle"></p>
+                        
+                        <!-- Meta Info -->
+                        <div class="reader-meta">
+                            <div class="meta-item hidden" id="metaAuthor">
+                                <i class="fas fa-user-pen"></i>
+                                <span id="authorName"></span>
+                            </div>
+                            <div class="meta-item hidden" id="metaDate">
+                                <i class="fas fa-calendar-days"></i>
+                                <span id="dateName"></span>
+                            </div>
+                            <div class="meta-item hidden" id="metaLocation">
+                                <i class="fas fa-location-dot"></i>
+                                <span id="locationName"></span>
+                            </div>
+                            <div class="meta-item" id="metaRead">
+                                <i class="fas fa-clock"></i>
+                                <span id="readTime"></span>
+                            </div>
+                        </div>
+
+                        <hr class="reader-divider">
+
+                        <!-- Key Highlights -->
+                        <div class="reader-highlights hidden" id="readerHighlights">
+                            <div class="highlights-header">
+                                <i class="fas fa-bolt"></i>
+                                <span data-i18n="keyHighlights">Key Highlights</span>
+                            </div>
+                            <ul class="highlights-list" id="highlightsList"></ul>
+                        </div>
+
+                        <!-- Translation Notice -->
+                        <div class="translate-notice hidden" id="translateNotice">
+                            <i class="fas fa-language"></i>
+                            <span id="translateNoticeText">Showing translated version</span>
+                            <button class="btn-text-sm" id="showOriginalBtn">Show Original</button>
+                        </div>
+
+                        <!-- Article Content -->
+                        <div class="reader-content" id="readerContent"></div>
+
+                        <!-- Image Gallery -->
+                        <div class="reader-gallery hidden" id="readerGallery">
+                            <h3 class="gallery-title">
+                                <i class="fas fa-images"></i>
+                                <span data-i18n="articleImages">Article Images</span>
+                            </h3>
+                            <div class="gallery-grid" id="galleryGrid"></div>
+                        </div>
+                    </div>
+
+                    <!-- Footer / Tags -->
+                    <div class="reader-footer hidden" id="readerFooter">
+                        <div class="reader-tags" id="readerTags">
+                            <i class="fas fa-tags"></i>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Raw Data -->
+                <div class="raw-section">
+                    <button class="btn-text" id="rawToggle">
+                        <i class="fas fa-code"></i>
+                        <span data-i18n="viewJson">View Raw JSON Data</span>
+                    </button>
+                    <pre class="raw-pre hidden" id="rawPre"></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- ====== HISTORY PANEL ====== -->
+        <div class="history-panel" id="historyPanel">
+            <div class="history-header">
+                <h2>
+                    <i class="fas fa-history"></i>
+                    <span data-i18n="historyTitle">Extraction History</span>
+                </h2>
+                <div class="history-header-actions">
+                    <button class="btn-text-sm" id="clearHistoryBtn" data-i18n="clearAll">Clear All</button>
+                    <button class="history-close" id="historyClose">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
-                <button id="scrapeBtn" class="scrape-btn">
-                    <i class="fas fa-search"></i>
-                    <span>Extract Article</span>
-                </button>
             </div>
-            
-            <!-- Bulk Mode Toggle -->
-            <div class="bulk-toggle">
-                <button id="bulkModeBtn" class="bulk-mode-btn">
-                    <i class="fas fa-list"></i> Bulk Mode (Multiple Links)
-                </button>
-            </div>
-            
-            <!-- Bulk Input (Hidden by default) -->
-            <div id="bulkInput" class="bulk-input hidden">
-                <textarea 
-                    id="bulkUrls" 
-                    placeholder="Paste multiple URLs here (one per line)..."
-                    rows="5"
-                ></textarea>
-                <button id="bulkScrapeBtn" class="scrape-btn">
-                    <i class="fas fa-layer-group"></i>
-                    <span>Extract All Articles</span>
-                </button>
-            </div>
-
-            <!-- Example Links -->
-            <div class="examples">
-                <span class="examples-label">Try example:</span>
-                <button class="example-link" data-url="https://www.bhaskar.com/national/news/india-news-latest-today-132456789-8975421.html">
-                    National News
-                </button>
-                <button class="example-link" data-url="https://www.bhaskar.com/local/rajasthan/news/rajasthan-news-132789456-7894561.html">
-                    Rajasthan News
-                </button>
+            <div class="history-body" id="historyBody">
+                <div class="history-empty" id="historyEmpty">
+                    <i class="fas fa-inbox"></i>
+                    <p data-i18n="noHistory">No articles extracted yet</p>
+                </div>
+                <div class="history-list" id="historyList"></div>
             </div>
         </div>
-    </section>
+        <div class="history-overlay hidden" id="historyOverlay"></div>
+    </main>
 
-    <!-- Loading State -->
-    <div id="loading" class="loading hidden">
-        <div class="container">
-            <div class="loading-card">
-                <div class="spinner"></div>
-                <p class="loading-text">Extracting article content...</p>
-                <div class="loading-steps">
-                    <div class="step active" id="step1">
-                        <i class="fas fa-globe"></i> Fetching page
-                    </div>
-                    <div class="step" id="step2">
-                        <i class="fas fa-code"></i> Parsing HTML
-                    </div>
-                    <div class="step" id="step3">
-                        <i class="fas fa-magic"></i> Extracting content
-                    </div>
-                </div>
-            </div>
+    <!-- ====== IMAGE MODAL ====== -->
+    <div class="img-modal hidden" id="imgModal">
+        <div class="img-modal-bg" id="imgModalBg"></div>
+        <div class="img-modal-body">
+            <button class="img-modal-close" id="imgModalClose"><i class="fas fa-times"></i></button>
+            <img id="imgModalImg" src="" alt="">
+            <p class="img-modal-cap" id="imgModalCap"></p>
         </div>
     </div>
 
-    <!-- Error State -->
-    <div id="error" class="error-section hidden">
-        <div class="container">
-            <div class="error-card">
-                <i class="fas fa-exclamation-triangle"></i>
-                <h3>Oops! Something went wrong</h3>
-                <p id="errorMessage">Unable to extract the article. Please check the URL and try again.</p>
-                <button id="retryBtn" class="retry-btn">
-                    <i class="fas fa-redo"></i> Try Again
-                </button>
-            </div>
-        </div>
+    <!-- ====== TOAST ====== -->
+    <div class="toast" id="toast">
+        <i class="fas fa-check-circle toast-icon" id="toastIcon"></i>
+        <span id="toastMsg"></span>
     </div>
 
-    <!-- Results Section -->
-    <section id="results" class="results-section hidden">
-        <div class="container">
-            <!-- Article Card -->
-            <article class="article-card" id="articleCard">
-                <!-- Article Meta Bar -->
-                <div class="article-meta-bar">
-                    <div class="meta-left">
-                        <span class="source-badge">
-                            <i class="fas fa-newspaper"></i> Dainik Bhaskar
-                        </span>
-                        <span class="date-badge" id="articleDate">
-                            <i class="fas fa-calendar-alt"></i> 
-                        </span>
-                    </div>
-                    <div class="meta-right">
-                        <button class="action-btn" id="copyBtn" title="Copy Article">
-                            <i class="fas fa-copy"></i>
-                        </button>
-                        <button class="action-btn" id="downloadBtn" title="Download as Text">
-                            <i class="fas fa-download"></i>
-                        </button>
-                        <button class="action-btn" id="shareBtn" title="Share">
-                            <i class="fas fa-share-alt"></i>
-                        </button>
-                        <a class="action-btn" id="originalLink" href="#" target="_blank" title="Open Original">
-                            <i class="fas fa-external-link-alt"></i>
-                        </a>
-                    </div>
-                </div>
-
-                <!-- Hero Image -->
-                <div class="hero-image-container" id="heroImageContainer">
-                    <img id="heroImage" src="" alt="Article Image" class="hero-image">
-                    <div class="image-caption" id="imageCaption"></div>
-                </div>
-
-                <!-- Article Content -->
-                <div class="article-content">
-                    <div class="category-tags" id="categoryTags"></div>
-                    <h1 class="article-title" id="articleTitle"></h1>
-                    <h2 class="article-subtitle" id="articleSubtitle"></h2>
-                    
-                    <div class="article-info">
-                        <div class="author-info" id="authorInfo">
-                            <i class="fas fa-user-edit"></i>
-                            <span id="articleAuthor"></span>
-                        </div>
-                        <div class="read-time" id="readTime">
-                            <i class="fas fa-clock"></i>
-                            <span></span>
-                        </div>
-                        <div class="location-info" id="locationInfo">
-                            <i class="fas fa-map-marker-alt"></i>
-                            <span id="articleLocation"></span>
-                        </div>
-                    </div>
-
-                    <div class="divider"></div>
-
-                    <!-- Key Points / Highlights -->
-                    <div class="key-points" id="keyPoints">
-                        <h3><i class="fas fa-star"></i> Key Highlights</h3>
-                        <ul id="keyPointsList"></ul>
-                    </div>
-
-                    <!-- Main Article Body -->
-                    <div class="article-body" id="articleBody"></div>
-
-                    <!-- Article Images Gallery -->
-                    <div class="image-gallery" id="imageGallery">
-                        <h3><i class="fas fa-images"></i> Article Images</h3>
-                        <div class="gallery-grid" id="galleryGrid"></div>
-                    </div>
-                </div>
-
-                <!-- Article Footer -->
-                <div class="article-footer">
-                    <div class="tags-section" id="tagsSection">
-                        <i class="fas fa-tags"></i>
-                        <div id="articleTags"></div>
-                    </div>
-                </div>
-            </article>
-
-            <!-- Raw Data Toggle -->
-            <div class="raw-data-section">
-                <button id="rawDataToggle" class="raw-data-btn">
-                    <i class="fas fa-code"></i> View Raw Extracted Data (JSON)
-                </button>
-                <pre id="rawData" class="raw-data hidden"></pre>
-            </div>
-        </div>
-    </section>
-
-    <!-- Image Modal -->
-    <div id="imageModal" class="modal hidden">
-        <div class="modal-overlay"></div>
-        <div class="modal-content">
-            <button class="modal-close" id="modalClose">
-                <i class="fas fa-times"></i>
-            </button>
-            <img id="modalImage" src="" alt="Full size image">
-            <p class="modal-caption" id="modalCaption"></p>
-        </div>
-    </div>
-
-    <!-- Toast Notification -->
-    <div id="toast" class="toast hidden">
-        <i class="fas fa-check-circle"></i>
-        <span id="toastMessage"></span>
-    </div>
-
-    <!-- Footer -->
+    <!-- ====== FOOTER ====== -->
     <footer class="footer">
-        <div class="container">
-            <p>Built with <i class="fas fa-heart" style="color: #e74c3c;"></i> | 
-            Uses CORS proxies for client-side scraping | 
-            <a href="https://github.com" target="_blank">
-                <i class="fab fa-github"></i> View on GitHub
-            </a></p>
+        <div class="container footer-inner">
+            <p>
+                Made with <i class="fas fa-heart" style="color:var(--accent)"></i> &middot; 
+                Runs entirely in your browser &middot; 
+                <a href="https://github.com" target="_blank" rel="noopener">
+                    <i class="fab fa-github"></i> GitHub
+                </a>
+            </p>
         </div>
     </footer>
 
