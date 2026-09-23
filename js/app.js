@@ -16,7 +16,7 @@
             bulkPlaceholder: 'Paste multiple URLs, one per line...',
             extractAll: 'Extract All Articles',
             qf1: '100% Free',
-            qf2: 'Custom Backend',
+            qf2: 'GAS Proxy',
             qf3: 'Hindi & English',
             qf4: 'Dark Mode',
             loadingTitle: 'Extracting Article...',
@@ -51,7 +51,7 @@
             bulkPlaceholder: 'एकाधिक URLs पेस्ट करें, प्रति पंक्ति एक...',
             extractAll: 'सभी लेख निकालें',
             qf1: '100% मुफ्त',
-            qf2: 'कस्टम बैकएंड',
+            qf2: 'गैस प्रॉक्सी',
             qf3: 'हिंदी और अंग्रेजी',
             qf4: 'डार्क मोड',
             loadingTitle: 'लेख निकाला जा रहा है...',
@@ -89,8 +89,9 @@
         translatedContent: '',
         isTranslated: false,
         fontSize: 'fs-md',
-        // Update this URL when you deploy your backend
-        backendUrl: 'http://localhost:8000/scrape'
+        
+        // REPLACE WITH YOUR GOOGLE APPS SCRIPT WEB APP URL
+        appsScriptUrl: 'YOUR_WEB_APP_URL_HERE'
     };
 
     // ========== DOM Cache ==========
@@ -233,7 +234,7 @@
         });
     }
 
-    // ========== Theme ==========
+    // ========== Theme & Language ==========
     function applyTheme(theme) {
         state.theme = theme;
         document.documentElement.setAttribute('data-theme', theme);
@@ -243,8 +244,6 @@
     function toggleTheme() {
         applyTheme(state.theme === 'dark' ? 'light' : 'dark');
     }
-
-    // ========== Language ==========
     function applyLang(lang) {
         state.lang = lang;
         localStorage.setItem('nl-lang', lang);
@@ -306,7 +305,7 @@
         dom.searchHero.classList.add('hidden');
         dom.loadingSection.classList.add('hidden');
         dom.errorSection.classList.add('hidden');
-        dom.resultsSection.classList.remove('hidden');
+        dom.resultsSection.remove('hidden');
         dom.scrapeBtn.disabled = false;
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
@@ -328,7 +327,7 @@
         state.isTranslated = false;
         dom.translateNotice.classList.add('hidden');
         try {
-            const html = await fetchWithBackend(url);
+            const html = await fetchWithProxy(url);
             updateStep(2);
             const data = parseArticle(html, url);
             updateStep(3);
@@ -343,22 +342,24 @@
         }
     }
 
-    // ========== Fetch via Python Backend ==========
-    async function fetchWithBackend(url) {
-        const res = await fetch(state.backendUrl, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ url: url })
-        });
+    // ========== Fetch via Apps Script Proxy ==========
+    async function fetchWithProxy(url) {
+        if (!state.appsScriptUrl || state.appsScriptUrl === 'YOUR_WEB_APP_URL_HERE') {
+            throw new Error('Please add your Google Apps Script URL in the js/app.js file.');
+        }
+
+        const target = state.appsScriptUrl + '?url=' + encodeURIComponent(url);
+        const res = await fetch(target, { redirect: 'follow' });
         
         if (!res.ok) {
-            const errData = await res.json().catch(() => ({}));
-            throw new Error(errData.detail || `HTTP ${res.status}`);
+            throw new Error(`HTTP ${res.status}`);
         }
         
         const data = await res.json();
+        if (data.error) {
+            throw new Error(data.error);
+        }
+        
         return data.html;
     }
 
