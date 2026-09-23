@@ -16,7 +16,7 @@
             bulkPlaceholder: 'Paste multiple URLs, one per line...',
             extractAll: 'Extract All Articles',
             qf1: '100% Free',
-            qf2: 'No Backend',
+            qf2: 'Custom Backend',
             qf3: 'Hindi & English',
             qf4: 'Dark Mode',
             loadingTitle: 'Extracting Article...',
@@ -51,7 +51,7 @@
             bulkPlaceholder: 'एकाधिक URLs पेस्ट करें, प्रति पंक्ति एक...',
             extractAll: 'सभी लेख निकालें',
             qf1: '100% मुफ्त',
-            qf2: 'कोई बैकएंड नहीं',
+            qf2: 'कस्टम बैकएंड',
             qf3: 'हिंदी और अंग्रेजी',
             qf4: 'डार्क मोड',
             loadingTitle: 'लेख निकाला जा रहा है...',
@@ -89,12 +89,8 @@
         translatedContent: '',
         isTranslated: false,
         fontSize: 'fs-md',
-        corsProxies: [
-            'https://api.allorigins.win/raw?url=',
-            'https://corsproxy.io/?',
-            'https://api.codetabs.com/v1/proxy?quest=',
-            'https://thingproxy.freeboard.io/fetch/',
-        ],
+        // Update this URL when you deploy your backend
+        backendUrl: 'http://localhost:8000/scrape'
     };
 
     // ========== DOM Cache ==========
@@ -103,13 +99,10 @@
     const dom = {};
 
     function cacheDom() {
-        // Sections
         dom.searchHero = $('#searchHero');
         dom.loadingSection = $('#loadingSection');
         dom.errorSection = $('#errorSection');
         dom.resultsSection = $('#resultsSection');
-
-        // Inputs
         dom.urlInput = $('#urlInput');
         dom.clearBtn = $('#clearBtn');
         dom.scrapeBtn = $('#scrapeBtn');
@@ -117,20 +110,14 @@
         dom.bulkBox = $('#bulkBox');
         dom.bulkUrls = $('#bulkUrls');
         dom.bulkScrapeBtn = $('#bulkScrapeBtn');
-
-        // Loading
         dom.pstep1 = $('#pstep1');
         dom.pstep2 = $('#pstep2');
         dom.pstep3 = $('#pstep3');
         dom.pline1 = $('#pline1');
         dom.pline2 = $('#pline2');
-
-        // Error
         dom.errorMessage = $('#errorMessage');
         dom.retryBtn = $('#retryBtn');
         dom.errorBackBtn = $('#errorBackBtn');
-
-        // Reader
         dom.backBtn = $('#backBtn');
         dom.sourceFavicon = $('#sourceFavicon');
         dom.sourceName = $('#sourceName');
@@ -156,8 +143,6 @@
         dom.readerFooter = $('#readerFooter');
         dom.readerTags = $('#readerTags');
         dom.originalLink = $('#originalLink');
-
-        // Actions
         dom.translateBtn = $('#translateBtn');
         dom.translateNotice = $('#translateNotice');
         dom.translateNoticeText = $('#translateNoticeText');
@@ -169,13 +154,9 @@
         dom.shareBtn = $('#shareBtn');
         dom.rawToggle = $('#rawToggle');
         dom.rawPre = $('#rawPre');
-
-        // Theme / Lang
         dom.themeToggle = $('#themeToggle');
         dom.themeIcon = $('#themeIcon');
         dom.langSwitcher = $('#langSwitcher');
-
-        // History
         dom.historyToggle = $('#historyToggle');
         dom.historyCount = $('#historyCount');
         dom.historyPanel = $('#historyPanel');
@@ -185,15 +166,11 @@
         dom.historyList = $('#historyList');
         dom.historyEmpty = $('#historyEmpty');
         dom.clearHistoryBtn = $('#clearHistoryBtn');
-
-        // Modal
         dom.imgModal = $('#imgModal');
         dom.imgModalBg = $('#imgModalBg');
         dom.imgModalClose = $('#imgModalClose');
         dom.imgModalImg = $('#imgModalImg');
         dom.imgModalCap = $('#imgModalCap');
-
-        // Toast
         dom.toast = $('#toast');
         dom.toastIcon = $('#toastIcon');
         dom.toastMsg = $('#toastMsg');
@@ -210,13 +187,10 @@
 
     // ========== Events ==========
     function bindEvents() {
-        // Scrape
         dom.scrapeBtn.addEventListener('click', handleScrape);
         dom.urlInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') handleScrape();
         });
-
-        // Clear
         dom.urlInput.addEventListener('input', () => {
             dom.clearBtn.classList.toggle('hidden', !dom.urlInput.value);
         });
@@ -225,39 +199,22 @@
             dom.clearBtn.classList.add('hidden');
             dom.urlInput.focus();
         });
-
-        // Bulk
         dom.bulkToggleBtn.addEventListener('click', () => {
             dom.bulkBox.classList.toggle('hidden');
         });
         dom.bulkScrapeBtn.addEventListener('click', handleBulkScrape);
-
-        // Error
         dom.retryBtn.addEventListener('click', handleScrape);
         dom.errorBackBtn.addEventListener('click', showSearch);
-
-        // Back
         dom.backBtn.addEventListener('click', showSearch);
-
-        // Theme
         dom.themeToggle.addEventListener('click', toggleTheme);
-
-        // Language
         dom.langSwitcher.addEventListener('click', (e) => {
             const btn = e.target.closest('.lang-btn');
-            if (btn) {
-                const lang = btn.dataset.lang;
-                applyLang(lang);
-            }
+            if (btn) applyLang(btn.dataset.lang);
         });
-
-        // History
         dom.historyToggle.addEventListener('click', openHistory);
         dom.historyClose.addEventListener('click', closeHistory);
         dom.historyOverlay.addEventListener('click', closeHistory);
         dom.clearHistoryBtn.addEventListener('click', clearHistory);
-
-        // Reader Actions
         dom.translateBtn.addEventListener('click', handleTranslate);
         dom.showOriginalBtn.addEventListener('click', showOriginalContent);
         dom.fontUpBtn.addEventListener('click', () => changeFontSize(1));
@@ -266,8 +223,6 @@
         dom.downloadBtn.addEventListener('click', downloadArticle);
         dom.shareBtn.addEventListener('click', shareArticle);
         dom.rawToggle.addEventListener('click', () => dom.rawPre.classList.toggle('hidden'));
-
-        // Modal
         dom.imgModalBg.addEventListener('click', closeImgModal);
         dom.imgModalClose.addEventListener('click', closeImgModal);
         document.addEventListener('keydown', (e) => {
@@ -285,7 +240,6 @@
         localStorage.setItem('nl-theme', theme);
         dom.themeIcon.className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
     }
-
     function toggleTheme() {
         applyTheme(state.theme === 'dark' ? 'light' : 'dark');
     }
@@ -294,26 +248,14 @@
     function applyLang(lang) {
         state.lang = lang;
         localStorage.setItem('nl-lang', lang);
-
-        // Update toggle
-        $$('.lang-btn').forEach(b => {
-            b.classList.toggle('active', b.dataset.lang === lang);
-        });
-
-        // Update all [data-i18n]
+        $$('.lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === lang));
         $$('[data-i18n]').forEach(el => {
             const key = el.getAttribute('data-i18n');
-            if (i18n[lang] && i18n[lang][key]) {
-                el.innerHTML = i18n[lang][key];
-            }
+            if (i18n[lang] && i18n[lang][key]) el.innerHTML = i18n[lang][key];
         });
-
-        // Update placeholders
         $$('[data-i18n-placeholder]').forEach(el => {
             const key = el.getAttribute('data-i18n-placeholder');
-            if (i18n[lang] && i18n[lang][key]) {
-                el.placeholder = i18n[lang][key];
-            }
+            if (i18n[lang] && i18n[lang][key]) el.placeholder = i18n[lang][key];
         });
     }
 
@@ -326,24 +268,19 @@
         dom.scrapeBtn.disabled = false;
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
-
     function showLoading() {
         dom.searchHero.classList.add('hidden');
         dom.errorSection.classList.add('hidden');
         dom.resultsSection.classList.add('hidden');
         dom.loadingSection.classList.remove('hidden');
         dom.scrapeBtn.disabled = true;
-
-        // Reset steps
         dom.pstep1.className = 'pstep active';
         dom.pstep2.className = 'pstep';
         dom.pstep3.className = 'pstep';
         dom.pline1.className = 'pstep-line';
         dom.pline2.className = 'pstep-line';
-
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
-
     function updateStep(n) {
         if (n >= 2) {
             dom.pstep1.className = 'pstep done';
@@ -356,7 +293,6 @@
             dom.pstep3.className = 'pstep active';
         }
     }
-
     function showError(msg) {
         dom.searchHero.classList.add('hidden');
         dom.loadingSection.classList.add('hidden');
@@ -366,7 +302,6 @@
         dom.scrapeBtn.disabled = false;
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
-
     function showResults() {
         dom.searchHero.classList.add('hidden');
         dom.loadingSection.classList.add('hidden');
@@ -383,20 +318,17 @@
         if (!isValidUrl(url)) { showError('Please enter a valid URL.'); return; }
         await scrapeUrl(url);
     }
-
     async function handleBulkScrape() {
         const urls = dom.bulkUrls.value.split('\n').map(u => u.trim()).filter(u => u && isValidUrl(u));
         if (!urls.length) { showError('Please enter at least one valid URL.'); return; }
-        await scrapeUrl(urls[0]); // Process first; extend for batch later
+        await scrapeUrl(urls[0]);
     }
-
     async function scrapeUrl(url) {
         showLoading();
         state.isTranslated = false;
         dom.translateNotice.classList.add('hidden');
-
         try {
-            const html = await fetchWithProxy(url);
+            const html = await fetchWithBackend(url);
             updateStep(2);
             const data = parseArticle(html, url);
             updateStep(3);
@@ -411,29 +343,23 @@
         }
     }
 
-    // ========== Fetch via CORS Proxy ==========
-    async function fetchWithProxy(url) {
-        let lastErr;
-        for (const proxy of state.corsProxies) {
-            try {
-                const pUrl = proxy + encodeURIComponent(url);
-                const controller = new AbortController();
-                const timeout = setTimeout(() => controller.abort(), 15000);
-                const res = await fetch(pUrl, {
-                    signal: controller.signal,
-                    headers: { 'Accept': 'text/html' }
-                });
-                clearTimeout(timeout);
-                if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                const html = await res.text();
-                if (html.length < 500) throw new Error('Response too short');
-                return html;
-            } catch (e) {
-                lastErr = e;
-                continue;
-            }
+    // ========== Fetch via Python Backend ==========
+    async function fetchWithBackend(url) {
+        const res = await fetch(state.backendUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ url: url })
+        });
+        
+        if (!res.ok) {
+            const errData = await res.json().catch(() => ({}));
+            throw new Error(errData.detail || `HTTP ${res.status}`);
         }
-        throw new Error('All proxies failed. ' + (lastErr ? lastErr.message : ''));
+        
+        const data = await res.json();
+        return data.html;
     }
 
     // ========== Parse Article ==========
@@ -442,54 +368,23 @@
         const doc = parser.parseFromString(html, 'text/html');
 
         const data = {
-            url: originalUrl,
-            title: '', subtitle: '', author: '', date: '', dateRaw: '',
-            location: '', content: '', contentHtml: '',
-            heroImage: '', heroCaption: '', images: [],
-            categories: [], tags: [], keyPoints: [], readTime: '',
-            domain: ''
+            url: originalUrl, title: '', subtitle: '', author: '', date: '', dateRaw: '',
+            location: '', content: '', contentHtml: '', heroImage: '', heroCaption: '', 
+            images: [], categories: [], tags: [], keyPoints: [], readTime: '', domain: ''
         };
-
         try { data.domain = new URL(originalUrl).hostname; } catch (e) {}
 
-        // Title
-        data.title = meta(doc, 'og:title')
-            || text(doc, 'h1.article-heading, h1._1Y9SF, h1.headline, .story-headline h1, h1[class*="title"], h1[class*="heading"]')
-            || text(doc, 'h1') || doc.title || '';
+        data.title = meta(doc, 'og:title') || text(doc, 'h1.article-heading, h1._1Y9SF, h1.headline, .story-headline h1, h1[class*="title"], h1[class*="heading"]') || text(doc, 'h1') || doc.title || '';
         data.title = data.title.replace(/\s*[-|].*$/i, '').trim();
-
-        // Subtitle
-        data.subtitle = meta(doc, 'og:description')
-            || text(doc, '.article-subheading, .story-subheadline, h2.sub-headline, [class*="subhead"], [class*="summary"]')
-            || '';
-
-        // Author
-        data.author = text(doc, '.author-name, .article-author, [class*="author"] a, [class*="author"] span, .byline, [rel="author"]')
-            || meta(doc, 'article:author') || meta(doc, 'author') || '';
-
-        // Date
-        data.dateRaw = meta(doc, 'article:published_time') || meta(doc, 'og:updated_time')
-            || text(doc, '.article-date, .publish-date, time, [class*="date"], .story-date') || '';
+        data.subtitle = meta(doc, 'og:description') || text(doc, '.article-subheading, .story-subheadline, h2.sub-headline, [class*="subhead"], [class*="summary"]') || '';
+        data.author = text(doc, '.author-name, .article-author, [class*="author"] a, [class*="author"] span, .byline, [rel="author"]') || meta(doc, 'article:author') || meta(doc, 'author') || '';
+        data.dateRaw = meta(doc, 'article:published_time') || meta(doc, 'og:updated_time') || text(doc, '.article-date, .publish-date, time, [class*="date"], .story-date') || '';
         data.date = formatDate(data.dateRaw);
-
-        // Location
         data.location = text(doc, '.article-location, .story-location, [class*="location"], .city-name') || '';
+        data.heroImage = meta(doc, 'og:image') || attr(doc, '.article-image img, .story-image img, .hero-image img, figure img', 'src') || '';
+        data.heroCaption = text(doc, 'figure figcaption, .image-caption') || attr(doc, 'figure img, .article-image img', 'alt') || '';
 
-        // Hero image
-        data.heroImage = meta(doc, 'og:image')
-            || attr(doc, '.article-image img, .story-image img, .hero-image img, figure img', 'src') || '';
-        data.heroCaption = text(doc, 'figure figcaption, .image-caption')
-            || attr(doc, 'figure img, .article-image img', 'alt') || '';
-
-        // Content
-        const contentSels = [
-            '.article-content', '.story-content', '.article-body', '.story-body',
-            '.story-details', '.article_content', '[class*="article-content"]',
-            '[class*="story-content"]', '.db_sty_cnt', '.StoryBody', '.contentArea',
-            '.news-content', '.detail-story', '.entry-content', '#article-body',
-            '.main-story', '.full-story', 'article .content', 'article'
-        ];
-
+        const contentSels = ['.article-content', '.story-content', '.article-body', '.story-body', '.story-details', '.article_content', '[class*="article-content"]', '[class*="story-content"]', '.db_sty_cnt', '.StoryBody', '.contentArea', '.news-content', '.detail-story', '.entry-content', '#article-body', '.main-story', '.full-story', 'article .content', 'article'];
         let contentEl = null;
         for (const sel of contentSels) {
             contentEl = doc.querySelector(sel);
@@ -498,16 +393,7 @@
 
         if (contentEl) {
             const clone = contentEl.cloneNode(true);
-            const removeSels = [
-                'script', 'style', 'iframe', 'nav', 'header', 'footer',
-                '.ad', '.ads', '[class*="ad-"]', '[class*="ads-"]',
-                '.social-share', '.share-buttons', '.related-articles',
-                '.comments', '.newsletter', '.sidebar', '.widget', '.popup',
-                '[class*="social"]', '[class*="share"]', '[class*="related"]',
-                '[class*="comment"]', '[class*="newsletter"]', '[class*="promo"]',
-                '.bread-crumb', '.breadcrumb',
-                '[id*="taboola"]', '[id*="outbrain"]'
-            ];
+            const removeSels = ['script', 'style', 'iframe', 'nav', 'header', 'footer', '.ad', '.ads', '[class*="ad-"]', '[class*="ads-"]', '.social-share', '.share-buttons', '.related-articles', '.comments', '.newsletter', '.sidebar', '.widget', '.popup', '[class*="social"]', '[class*="share"]', '[class*="related"]', '[class*="comment"]', '[class*="newsletter"]', '[class*="promo"]', '.bread-crumb', '.breadcrumb', '[id*="taboola"]', '[id*="outbrain"]'];
             removeSels.forEach(s => clone.querySelectorAll(s).forEach(e => e.remove()));
             data.contentHtml = clone.innerHTML.trim();
             data.content = clone.textContent.replace(/\s+/g, ' ').trim();
@@ -521,7 +407,6 @@
             data.contentHtml = ps.map(p => `<p>${esc(p)}</p>`).join('');
         }
 
-        // Images
         const seen = new Set();
         if (data.heroImage) seen.add(data.heroImage);
         doc.querySelectorAll('img').forEach(img => {
@@ -532,7 +417,6 @@
             }
         });
 
-        // Categories
         doc.querySelectorAll('.breadcrumb a, .bread-crumb a, nav[class*="bread"] a, [class*="category"] a').forEach(a => {
             const t = a.textContent.trim();
             if (t && !/home/i.test(t) && t.length < 40) data.categories.push(t);
@@ -542,7 +426,6 @@
             if (cs) data.categories.push(cs);
         }
 
-        // Tags
         const kw = meta(doc, 'keywords') || meta(doc, 'news_keywords') || '';
         if (kw) data.tags = kw.split(',').map(t => t.trim()).filter(t => t && t.length < 50);
         doc.querySelectorAll('.tags a, [class*="tag"] a, .keywords a').forEach(a => {
@@ -550,7 +433,6 @@
             if (t && !data.tags.includes(t) && t.length < 50) data.tags.push(t);
         });
 
-        // Key points
         doc.querySelectorAll('.highlights li, .key-points li, [class*="highlight"] li, .story-highlights li').forEach(li => {
             const t = li.textContent.trim();
             if (t) data.keyPoints.push(t);
@@ -559,7 +441,6 @@
             data.keyPoints = autoKeyPoints(data.content);
         }
 
-        // Read time
         const wc = data.content.split(/\s+/).length;
         data.readTime = Math.max(1, Math.ceil(wc / 200)) + ' min read';
 
@@ -574,15 +455,11 @@
 
     // ========== Display Article ==========
     function displayArticle(data) {
-        // Source
-        try {
-            dom.sourceFavicon.src = `https://www.google.com/s2/favicons?domain=${data.domain}&sz=32`;
-        } catch (e) {}
+        try { dom.sourceFavicon.src = `https://www.google.com/s2/favicons?domain=${data.domain}&sz=32`; } catch (e) {}
         dom.sourceName.textContent = data.domain || 'News Source';
         dom.sourceDate.textContent = data.date || '';
         dom.originalLink.href = data.url;
 
-        // Hero
         if (data.heroImage) {
             dom.heroImage.src = data.heroImage;
             dom.heroImage.alt = data.title;
@@ -594,7 +471,6 @@
             dom.readerHero.classList.add('hidden');
         }
 
-        // Categories
         if (data.categories.length) {
             dom.readerCats.innerHTML = data.categories.map(c => `<span class="cat-chip">${esc(c)}</span>`).join('');
             dom.readerCats.classList.remove('hidden');
@@ -602,10 +478,8 @@
             dom.readerCats.innerHTML = '';
         }
 
-        // Title
         dom.readerTitle.textContent = data.title || 'Title Not Found';
 
-        // Subtitle
         if (data.subtitle && data.subtitle !== data.title) {
             dom.readerSubtitle.textContent = data.subtitle;
             dom.readerSubtitle.classList.remove('hidden');
@@ -613,7 +487,6 @@
             dom.readerSubtitle.classList.add('hidden');
         }
 
-        // Meta
         if (data.author) {
             dom.authorName.textContent = data.author;
             dom.metaAuthor.classList.remove('hidden');
@@ -631,13 +504,11 @@
 
         dom.readTime.textContent = data.readTime || '';
 
-        // Highlights
         if (data.keyPoints.length) {
             dom.highlightsList.innerHTML = data.keyPoints.map(p => `<li>${esc(p)}</li>`).join('');
             dom.readerHighlights.classList.remove('hidden');
         } else dom.readerHighlights.classList.add('hidden');
 
-        // Content
         if (data.contentHtml) {
             dom.readerContent.innerHTML = sanitize(data.contentHtml);
         } else if (data.content) {
@@ -647,7 +518,6 @@
             dom.readerContent.innerHTML = '<p class="no-content">Could not extract article content.</p>';
         }
 
-        // Gallery
         if (data.images.length) {
             dom.galleryGrid.innerHTML = data.images.slice(0, 12).map(img =>
                 `<div class="gallery-item" data-src="${escAttr(img.src)}" data-alt="${escAttr(img.alt)}">
@@ -655,8 +525,6 @@
                 </div>`
             ).join('');
             dom.readerGallery.classList.remove('hidden');
-
-            // Bind gallery clicks
             dom.galleryGrid.querySelectorAll('.gallery-item').forEach(item => {
                 item.addEventListener('click', () => {
                     openImgModal(item.dataset.src, item.dataset.alt);
@@ -664,7 +532,6 @@
             });
         } else dom.readerGallery.classList.add('hidden');
 
-        // Tags
         if (data.tags.length) {
             const existingIcon = dom.readerTags.querySelector('i');
             dom.readerTags.innerHTML = '';
@@ -676,29 +543,22 @@
             dom.readerFooter.classList.remove('hidden');
         } else dom.readerFooter.classList.add('hidden');
 
-        // Raw
         dom.rawPre.textContent = JSON.stringify(data, null, 2);
         dom.rawPre.classList.add('hidden');
-
-        // Reset font size
         dom.readerContent.className = 'reader-content ' + state.fontSize;
-
         showResults();
     }
 
     // ========== Translation ==========
     async function handleTranslate() {
         if (!state.extractedData) return;
-
         if (state.isTranslated) {
             showOriginalContent();
             return;
         }
-
         const content = state.originalContent;
         if (!content) return;
 
-        // Detect if Hindi → translate to English, else translate to Hindi
         const isHindi = /[\u0900-\u097F]/.test(content.substring(0, 200));
         const sourceLang = isHindi ? 'hi' : 'en';
         const targetLang = isHindi ? 'en' : 'hi';
@@ -708,48 +568,36 @@
 
         try {
             const plainText = dom.readerContent.textContent;
-            // Using free Google Translate API (unofficial)
             const translated = await translateText(plainText, sourceLang, targetLang);
-
             if (translated) {
                 state.translatedContent = translated;
                 state.isTranslated = true;
-
-                // Display translated
                 dom.readerContent.innerHTML = translated.split('\n').filter(p => p.trim())
                     .map(p => `<p>${esc(p)}</p>`).join('');
-
                 dom.translateNotice.classList.remove('hidden');
-                dom.translateNoticeText.textContent =
-                    `${i18n[state.lang].translated} (${sourceLang.toUpperCase()} → ${targetLang.toUpperCase()})`;
-
+                dom.translateNoticeText.textContent = `${i18n[state.lang].translated} (${sourceLang.toUpperCase()} → ${targetLang.toUpperCase()})`;
                 toast(i18n[state.lang].translated, 'fa-check-circle');
             }
         } catch (err) {
             console.error('Translation error:', err);
             toast(i18n[state.lang].translateError, 'fa-exclamation-circle');
         }
-
         dom.translateBtn.disabled = false;
     }
 
     async function translateText(text, from, to) {
-        // Chunk text if too long (Google translate limit ~5000 chars)
         const chunks = chunkText(text, 4500);
         let result = '';
-
         for (const chunk of chunks) {
             const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${from}&tl=${to}&dt=t&q=${encodeURIComponent(chunk)}`;
             const res = await fetch(url);
             const json = await res.json();
-
             if (json && json[0]) {
                 json[0].forEach(part => {
                     if (part[0]) result += part[0];
                 });
             }
         }
-
         return result;
     }
 
@@ -758,7 +606,6 @@
         let start = 0;
         while (start < text.length) {
             let end = Math.min(start + maxLen, text.length);
-            // Try to break at sentence boundary
             if (end < text.length) {
                 const lastPeriod = text.lastIndexOf('.', end);
                 const lastQuestion = text.lastIndexOf('?', end);
@@ -789,32 +636,17 @@
 
     // ========== History ==========
     function addToHistory(data) {
-        const entry = {
-            id: Date.now(),
-            url: data.url,
-            title: data.title,
-            image: data.heroImage,
-            date: data.date,
-            domain: data.domain,
-            timestamp: new Date().toISOString()
-        };
-
-        // Remove duplicate
+        const entry = { id: Date.now(), url: data.url, title: data.title, image: data.heroImage, date: data.date, domain: data.domain, timestamp: new Date().toISOString() };
         state.history = state.history.filter(h => h.url !== data.url);
         state.history.unshift(entry);
-
-        // Keep max 50
         if (state.history.length > 50) state.history = state.history.slice(0, 50);
-
         localStorage.setItem('nl-history', JSON.stringify(state.history));
         updateHistoryUI();
     }
-
     function updateHistoryUI() {
         const count = state.history.length;
         dom.historyCount.textContent = count;
         dom.historyCount.dataset.count = count;
-
         if (count === 0) {
             dom.historyEmpty.classList.remove('hidden');
             dom.historyList.classList.add('hidden');
@@ -838,19 +670,15 @@
                     </button>
                 </div>
             `).join('');
-
-            // Bind clicks
             dom.historyList.querySelectorAll('.history-item').forEach(item => {
                 item.addEventListener('click', (e) => {
                     if (e.target.closest('.history-delete')) return;
-                    const url = item.dataset.url;
-                    dom.urlInput.value = url;
+                    dom.urlInput.value = item.dataset.url;
                     dom.clearBtn.classList.remove('hidden');
                     closeHistory();
                     handleScrape();
                 });
             });
-
             dom.historyList.querySelectorAll('.history-delete').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     e.stopPropagation();
@@ -862,19 +690,16 @@
             });
         }
     }
-
     function openHistory() {
         dom.historyPanel.classList.add('open');
         dom.historyOverlay.classList.remove('hidden');
         setTimeout(() => dom.historyOverlay.classList.add('show'), 10);
     }
-
     function closeHistory() {
         dom.historyPanel.classList.remove('open');
         dom.historyOverlay.classList.remove('show');
         setTimeout(() => dom.historyOverlay.classList.add('hidden'), 300);
     }
-
     function clearHistory() {
         if (!confirm('Clear all history?')) return;
         state.history = [];
@@ -899,7 +724,6 @@
         }
         toast(i18n[state.lang].copied);
     }
-
     function downloadArticle() {
         if (!state.extractedData) return;
         const d = state.extractedData;
@@ -921,7 +745,6 @@
             t += `\nIMAGES:\n`;
             d.images.forEach((img, i) => t += `  ${i + 1}. ${img.src}\n`);
         }
-
         const blob = new Blob([t], { type: 'text/plain;charset=utf-8' });
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
@@ -930,7 +753,6 @@
         URL.revokeObjectURL(a.href);
         toast(i18n[state.lang].downloaded);
     }
-
     async function shareArticle() {
         if (!state.extractedData) return;
         if (navigator.share) {
@@ -955,7 +777,6 @@
         dom.imgModal.classList.remove('hidden');
         document.body.style.overflow = 'hidden';
     }
-
     function closeImgModal() {
         dom.imgModal.classList.add('hidden');
         document.body.style.overflow = '';
@@ -975,22 +796,18 @@
         try { const u = new URL(s); return u.protocol === 'http:' || u.protocol === 'https:'; }
         catch (e) { return false; }
     }
-
     function meta(doc, prop) {
         const el = doc.querySelector(`meta[property="${prop}"], meta[name="${prop}"]`);
         return el ? (el.getAttribute('content') || '').trim() : '';
     }
-
     function text(doc, sel) {
         const el = doc.querySelector(sel);
         return el ? el.textContent.trim() : '';
     }
-
     function attr(doc, sel, a) {
         const el = doc.querySelector(sel);
         return el ? (el.getAttribute(a) || '').trim() : '';
     }
-
     function formatDate(raw) {
         if (!raw) return '';
         try {
@@ -1002,7 +819,6 @@
             });
         } catch (e) { return raw; }
     }
-
     function timeAgo(iso) {
         if (!iso) return '';
         const diff = Date.now() - new Date(iso).getTime();
@@ -1015,7 +831,6 @@
         if (days < 7) return days + 'd ago';
         return new Date(iso).toLocaleDateString();
     }
-
     function isContentImage(src) {
         if (!src) return false;
         const l = src.toLowerCase();
@@ -1026,7 +841,6 @@
         if (exclude.some(p => l.includes(p))) return false;
         return /\.(jpg|jpeg|png|webp|avif)/i.test(l) || l.includes('image');
     }
-
     function sanitize(html) {
         return html
             .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
@@ -1035,23 +849,19 @@
             .replace(/javascript:/gi, '')
             .replace(/<iframe[^>]*>.*?<\/iframe>/gi, '');
     }
-
     function esc(t) {
         const d = document.createElement('div');
         d.textContent = t || '';
         return d.innerHTML;
     }
-
     function escAttr(t) {
         return (t || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;').replace(/</g, '&lt;');
     }
-
     function createEl(tag, props) {
         const el = document.createElement(tag);
         Object.assign(el, props || {});
         return el;
     }
-
     function delay(ms) {
         return new Promise(r => setTimeout(r, ms));
     }
