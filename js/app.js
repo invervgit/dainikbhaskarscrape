@@ -344,7 +344,7 @@
 
     // ========== Fetch via Apps Script Proxy ==========
     async function fetchWithProxy(url) {
-        if (!state.appsScriptUrl || state.appsScriptUrl === 'https://script.google.com/a/macros/inverv.com/s/AKfycbwaXjlZWB5REHVn3M7BtuIMam5oPvWj0Iu3oZnTAy-UlWXTbjnUH8LTvpUicYsppHvK8w/exec') {
+        if (!state.appsScriptUrl || state.appsScriptUrl === 'https://script.google.com/macros/s/AKfycbwaXjlZWB5REHVn3M7BtuIMam5oPvWj0Iu3oZnTAy-UlWXTbjnUH8LTvpUicYsppHvK8w/exec') {
             throw new Error('Please add your Google Apps Script URL in the js/app.js file.');
         }
 
