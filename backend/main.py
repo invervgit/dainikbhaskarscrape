@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from playwright.async_api import async_playwright
 import uvicorn
-
+ 
 app = FastAPI(title="NewsLens Scraper API")
 
 # Allow your frontend to talk to this backend
